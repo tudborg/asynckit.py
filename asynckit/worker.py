@@ -1,7 +1,8 @@
 
 import threading
 import Queue
-from errors import InvalidWorkTypeError
+from errors import InvalidWorkTypeError, RescheduleException
+from value  import AsyncValue
 
 
 class Worker(threading.Thread):
@@ -25,8 +26,28 @@ class Worker(threading.Thread):
             
             if callable(work):
                 try:
-                    result = work(*args, **kwargs)
-                except Exception, e:
+                    # check if any of the args are instance of AsyncValue
+                    # and resolve if possible, else reschedule work
+                    new_args = []
+                    for arg in args:
+                        if isinstance(arg, AsyncValue):
+                            if arg.is_set(): new_args.append(arg.get())
+                            else:            raise RescheduleException()
+                        else: new_args.append(arg)
+
+                    new_kwargs = {}
+                    for key,value in kwargs.items():
+                        if isinstance(value, AsyncValue):
+                            if value.is_set(): new_kwargs[key] = value.get()
+                            else:              raise RescheduleException()
+                        else: new_kwargs[key] = value
+
+                    result = work(*new_args, **new_kwargs)
+                #if reschedule exception, reschedule and continue
+                except RescheduleException as e:
+                    self.scheduled_work.put( (event, work, args, kwargs) )
+                    continue
+                except Exception as e:
                     result = e
             else:
                 result = InvalidWorkTypeError("work should be instance of callable or WorkerCommand, was of type {}".format(type(work)))

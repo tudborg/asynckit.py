@@ -1,7 +1,7 @@
 import unittest
 
-from ..value import AsyncValue
-from ..      import AsyncValueError
+from ..value  import AsyncValue
+from ..errors import AsyncValueError
 import time
 import threading
 

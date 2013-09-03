@@ -3,7 +3,7 @@ import unittest
 from ..value  import AsyncValue
 from ..worker import Worker
 from ..pool   import Pool
-from ..       import WorkerError, InvalidWorkTypeError
+from ..errors import WorkerError, InvalidWorkTypeError
 import time
 import threading
 import Queue
