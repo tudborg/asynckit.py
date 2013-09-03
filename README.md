@@ -60,6 +60,27 @@ This is identical to calling `.wait()` just before calling `.get()`.
 
 `.get()` returns the return value of your work, or raise an exception thrown inside your work.
 
+### Chaining Work
+
+You can chain work simply by using an `AsyncResult` object as the value for other work.
+The work will automatically be handled when all resuls are ready, or when an exception is
+thrown in one of the results.
+
+```python
+
+a = AsyncResult()
+b = AsyncResult()
+
+# schedule some work with the arguments: a,1,b,2
+# (2 out of 4 arguments are AsyncResult objects)
+myAsyncResult = pool.do(work, a, 1, b, 2)
+
+# set the value of out AsyncResult objects
+a.set("my A value")  # pool still missing b value
+b.set("my B value")  # pool will do work here
+```
+
+
 
 Example
 ----------
