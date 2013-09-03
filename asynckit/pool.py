@@ -63,9 +63,9 @@ class Pool(object):
             will block without timeout if timeout is 0"""
 
         # accept bools indication if should block
-        if timeout == True:
+        if timeout is True:
             timeout = 0
-        if timeout == False:
+        elif timeout is False:
             timeout = None
 
         if isinstance(timeout, (int,float)):
