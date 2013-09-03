@@ -1,6 +1,6 @@
 __author__     = "Henrik Tudborg"
 __license__    = "MIT"
-__version__    = "1.0.0"
+__version__    = "0.1.0"
 __maintainer__ = "Henrik Tudborg"
 __email__      = "henrik@tudb.org"
 
