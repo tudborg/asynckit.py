@@ -12,7 +12,7 @@ Usage
 Example
 ----------
 ```python
-from asynckit.pool import Pool
+from asynckit import Pool
 import urllib2
 
 my_pool = Pool(worker_count=3)
@@ -43,4 +43,5 @@ print "downloaded {} bytes from python.org".format(len(pythonPage))
 
 # stop pool, block until pool is stopped
 my_pool.stop(True)
+
 ```
