@@ -1,7 +1,7 @@
 
 import threading
 import Queue
-from . import InvalidWorkTypeError
+from errors import InvalidWorkTypeError
 
 
 class Worker(threading.Thread):

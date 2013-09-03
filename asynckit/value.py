@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 import threading
-from . import AsyncValueError
+from errors import AsyncValueError
 
 class AsyncValue(threading._Event):
     """ AsyncValue is a threading.Event with an attached value"""
