@@ -61,6 +61,13 @@ class Pool(object):
     def stop(self, timeout=None):
         """ stop workers, return list of worker threads. Will block if timeout is number
             will block without timeout if timeout is 0"""
+
+        # accept bools indication if should block
+        if timeout == True:
+            timeout = 0
+        if timeout == False:
+            timeout = None
+
         if isinstance(timeout, (int,float)):
             # blocking code
             [worker.stop() for worker in self._workers]
