@@ -20,9 +20,8 @@ class TestPoolCase(unittest.TestCase):
     def test_pool_start_stop_blocking(self):
         # test that pool starts and stops workers as expected
         p = Pool()
-        workers = p.stop(timeout=0.1)
+        workers = p.stop(timeout=0.2)
         for worker in workers:
-            worker.join(timeout=0.1)
             self.assertFalse(worker.is_alive())
 
     def test_pool_start_stop_nonblocking(self):
