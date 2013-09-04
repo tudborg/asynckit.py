@@ -90,8 +90,8 @@ class TestWorkerCase(unittest.TestCase):
         worker = Worker(q)                        # create worker
         worker.start()                            # start worker
         res = AsyncValue()
-        def work(a,b):
-            return a+b
+        def work(a,b,c):
+            return a+b+c
 
         a = AsyncValue()
         b = AsyncValue()
@@ -100,7 +100,7 @@ class TestWorkerCase(unittest.TestCase):
         #b.set(2)                                 # don't set be to trigger reschedule
 
         #put a work tuple in queue
-        q.put( (res, work, [a,b], {}) )
+        q.put( (res, work, [a,b,1], {}) )
         res.wait(timeout=0.1)                     # wait for work to (not) complete
         self.assertFalse(res.is_set())            # work not complete yes due to missing value
 
@@ -108,15 +108,15 @@ class TestWorkerCase(unittest.TestCase):
         res.wait(timeout=0.2)                     # wait for result, this time it should complete
 
         self.assertTrue(res.is_set())             # assert result was actually set
-        self.assertEqual(res.get(), 3)            # assert result is the correct value ( 1+2 = 3 )
+        self.assertEqual(res.get(), 4)            # assert result is the correct value ( 1+2+1 = 3 )
 
     def test_worker_handles_reschedule_kwargs_version(self):
         q = Queue.Queue()                         # queue
         worker = Worker(q)                        # create worker
         worker.start()                            # start worker
         res = AsyncValue()
-        def work(a,b):
-            return a+b
+        def work(a,b,c):
+            return a+b+c
 
         a = AsyncValue()
         b = AsyncValue()
@@ -125,7 +125,7 @@ class TestWorkerCase(unittest.TestCase):
         #b.set(2)                                 # don't set be to trigger reschedule
 
         #put a work tuple in queue
-        q.put( (res, work, [], {'a': a, 'b': b}) )
+        q.put( (res, work, [], {'a': a, 'b': b, 'c': 1}) )
         res.wait(timeout=0.1)                     # wait for work to (not) complete
         self.assertFalse(res.is_set())            # work not complete yes due to missing value
 
@@ -133,4 +133,4 @@ class TestWorkerCase(unittest.TestCase):
         res.wait(timeout=0.2)                     # wait for result, this time it should complete
 
         self.assertTrue(res.is_set())             # assert result was actually set
-        self.assertEqual(res.get(), 3)            # assert result is the correct value ( 1+2 = 3 )
+        self.assertEqual(res.get(), 4)            # assert result is the correct value ( 1+2+1 = 4 )

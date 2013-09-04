@@ -24,10 +24,25 @@ class TestPoolCase(unittest.TestCase):
         for worker in workers:
             self.assertFalse(worker.is_alive())
 
+    def test_pool_start_stop_blocking_bool_arg(self):
+        # test that pool starts and stops workers as expected
+        p = Pool()
+        workers = p.stop(True)       # True is shortcut for block-forever
+        for worker in workers:
+            self.assertFalse(worker.is_alive())
+
     def test_pool_start_stop_nonblocking(self):
         # test that pool starts and stops workers as expected
         p = Pool()
-        workers = p.stop()
+        workers = p.stop(None)       # non blocking
+        for worker in workers:
+            worker.join(timeout=0.2) # give each worker 200ms to stop
+            self.assertFalse(worker.is_alive())
+
+    def test_pool_start_stop_nonblocking_bool_arg(self):
+        # test that pool starts and stops workers as expected
+        p = Pool()
+        workers = p.stop(False)      # false is shortcut for don't block at all
         for worker in workers:
             worker.join(timeout=0.2) # give each worker 200ms to stop
             self.assertFalse(worker.is_alive())
