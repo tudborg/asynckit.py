@@ -30,7 +30,7 @@ class TestPoolCase(unittest.TestCase):
         p = Pool()
         workers = p.stop()
         for worker in workers:
-            worker.join(timeout=0.1)
+            worker.join(timeout=0.2) # give each worker 200ms to stop
             self.assertFalse(worker.is_alive())
 
     def test_pool_scale(self):
