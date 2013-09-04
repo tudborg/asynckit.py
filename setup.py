@@ -21,7 +21,7 @@ setup(
     url              = 'https://github.com/tbug/asynckit.py',
     keywords         = 'async utility util asynckit helper',
     packages         = find_packages(exclude=['test*']),
-    install_requires = [
+    tests_require = [
         'nose==1.3',
         'coverage==3.6',
         'python-coveralls==2.4.0'
