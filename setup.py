@@ -26,5 +26,12 @@ setup(
         'coverage==3.6',
         'python-coveralls==2.4.0'
     ],
-    long_description = long_description
+    long_description = long_description,
+    classifiers      = [
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: MacOS',
+        'Operating System :: POSIX',
+    ]
 )
