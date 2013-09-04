@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tbug/asynckit.py.png?branch=master)](https://travis-ci.org/tbug/asynckit.py)
+
 asynckit.py
 ===========
 
