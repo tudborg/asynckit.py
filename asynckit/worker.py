@@ -19,11 +19,14 @@ class Worker(threading.Thread):
     def run(self):
         while not self.stop_event.is_set():
             work = None
+            exception = None
+            result = None
+
             try:
                 event, work, args, kwargs = self.scheduled_work.get(True, 0.1)
             except Queue.Empty:
                 continue
-            
+
             if callable(work):
                 try:
                     # check if any of the args are instance of AsyncValue
@@ -48,9 +51,9 @@ class Worker(threading.Thread):
                     self.scheduled_work.put( (event, work, args, kwargs) )
                     continue
                 except Exception as e:
-                    result = e
+                    exception = e
             else:
-                result = InvalidWorkTypeError("work should be instance of callable or WorkerCommand, was of type {}".format(type(work)))
+                exception = InvalidWorkTypeError("work should be instance of callable or WorkerCommand, was of type {}".format(type(work)))
 
             #set event with result
-            event.set(result)
+            event.set(result, exception)

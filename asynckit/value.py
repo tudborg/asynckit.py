@@ -9,19 +9,22 @@ class AsyncValue(threading._Event):
     def __init__(self):
         super(AsyncValue, self).__init__()
         self._value = None
+        self._exception = None
 
     def clear(self):
         """ clear event and value """
         super(AsyncValue, self).clear()
         self._value = None
+        self._exception = None
 
-    def set(self, value):
+    def set(self, value=None, exception=None):
         """set value (this also sets the event, just like a set() call to a regular event)
            value can be any value. If instance of Exception, it will be re-raised when
            someone tries to get the value"""
         if self.is_set():
             raise AsyncValueError('value already set')
         self._value = value
+        self._exception = exception
         super(AsyncValue, self).set()
 
     def get(self, timeout=None):
@@ -33,7 +36,10 @@ class AsyncValue(threading._Event):
 
         if should_block and not self.is_set():
             self.wait(actual_timeout)
-        if isinstance(self._value, Exception):
-            raise self._value
+        if self._exception is not None:
+            raise self._exception
         else:
             return self._value
+
+    def is_error(self):
+        return self._exception is not None

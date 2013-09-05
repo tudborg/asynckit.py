@@ -76,6 +76,7 @@ class TestAsyncValue(unittest.TestCase):
     def test_raises_if_value_is_exception(self):
         class TestCaseException(Exception): pass
         res = AsyncValue()
-        res.set(TestCaseException('expected'))
+        res.set(None, TestCaseException('expected'))       # set value None, exception TestCaseException
+        self.assertTrue(res.is_error())                    # assert that result is error (due to exception)
         self.assertRaises(TestCaseException, res.get)      # get exception should raise it
         self.assertRaises(TestCaseException, res.get)      # get again should still raise it
