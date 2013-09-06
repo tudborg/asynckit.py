@@ -14,7 +14,10 @@ install: ;
 	cd ${CURDIR}
 	pip install -r requirements.txt
 
-.set_pypirc: ;
+.version_notice: ;
+	@echo "Remembered to bump the version?!"
+
+.set_pypirc: .version_notice ;
 	#creates the ~/.pypirc file for release
 	@echo "\
 [distutils] \n\
@@ -30,7 +33,6 @@ password:$(shell if [ -z $(password) ] ; then read -s -p "PyPI Pass: " REPLY ; e
 	@rm ~/.pypirc
 
 .do_release: ;
-	echo "Remembered to bump the version?"
 	python setup.py register
 	python setup.py sdist upload
 
