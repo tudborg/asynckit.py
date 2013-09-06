@@ -3,12 +3,15 @@
 import threading
 from errors import AsyncValueError
 
-class AsyncValue(threading._Event):
+class AsyncBase(object):
+    pass
+
+class AsyncValue(threading._Event, AsyncBase):
     """ AsyncValue is a threading.Event with an attached value"""
 
     def __init__(self):
         super(AsyncValue, self).__init__()
-        self._value = None
+        self._value     = None
         self._exception = None
 
     def clear(self):
@@ -43,3 +46,33 @@ class AsyncValue(threading._Event):
 
     def is_error(self):
         return self._exception is not None
+
+
+class AsyncAggregator(AsyncBase):
+    """takes a list of AsyncValue and waits for all of them to be set before self is set"""
+    def __init__(self, *iterable):
+        self._values = [i for i in iterable]
+
+    def append(self, value):
+        return self._values.append(value)
+
+    def remove(self, value):
+        return self._values.remove(value)
+
+    def set(self, *args, **kwargs):
+        [value.set(*args, **kwargs) for value in self._values]
+
+    def isSet(self):
+        return self.is_set()
+
+    def is_set(self):
+        for value in self._values:
+            if not value.is_set():
+                return False
+        return len(self._values) > 0  # will not appear set if no values is stored
+
+    def clear(self, *args, **kwargs):
+        [value.clear(*args, **kwargs) for value in self._values]
+
+    def wait(self, *args, **kwargs):
+        [value.wait(*args, **kwargs) for value in self._values]
