@@ -76,3 +76,10 @@ class AsyncAggregator(AsyncBase):
 
     def wait(self, *args, **kwargs):
         [value.wait(*args, **kwargs) for value in self._values]
+
+    def is_error(self):
+        for value in self._values:
+            if hasattr(value, 'is_error') and value.is_error():
+                return True
+        return False
+

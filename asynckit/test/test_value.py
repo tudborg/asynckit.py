@@ -158,3 +158,17 @@ class TestAsyncAggregator(unittest.TestCase):
         agg.wait(timeout=1.0)
         self.assertTrue(agg.is_set())
 
+
+    def test_aggregator_is_error(self):
+        class TestCaseException(Exception):pass
+        v1 = AsyncValue()
+        v2 = AsyncValue()
+        agg = AsyncAggregator(v1,v2)
+        v1.set(True)
+        v2.set(exception=TestCaseException())
+        #v2 has error and is in aggregator so agg is error
+        self.assertTrue(agg.is_error())
+        #remove problem
+        agg.remove(v2)
+        #should now pass
+        self.assertFalse(agg.is_error())

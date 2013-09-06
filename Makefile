@@ -30,6 +30,7 @@ password:$(shell if [ -z $(password) ] ; then read -s -p "PyPI Pass: " REPLY ; e
 	@rm ~/.pypirc
 
 .do_release: ;
+	echo "Remembered to bump the version?"
 	python setup.py register
 	python setup.py sdist upload
 
