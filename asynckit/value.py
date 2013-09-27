@@ -3,10 +3,7 @@
 import threading
 from errors import AsyncValueError
 
-class AsyncBase(object):
-    pass
-
-class AsyncValue(threading._Event, AsyncBase):
+class AsyncValue(threading._Event):
     """ AsyncValue is a threading.Event with an attached value"""
 
     def __init__(self):
@@ -47,10 +44,46 @@ class AsyncValue(threading._Event, AsyncBase):
     def is_error(self):
         return self._exception is not None
 
+class AsyncList(AsyncValue):
+    """ AsyncList contains 0 or more AsyncValues
+        An AsyncList is set when all AsyncValues in the list is set.
+        An AsyncList will raise an exception if one of it's elements raises an exception
+        An AsyncList is itself an AsyncValue"""
 
-class AsyncAggregator(AsyncBase):
-    """takes a list of AsyncValue and waits for all of them to be set before self is set"""
+    def __init__(self, l=[]):
+        super(AsyncList, self).__init__()
+        self._value = l
+
+    def set(self, value=None, exception=None):
+        raise AsyncValueError("AsyncList cannot be set directly")
+
+    def clear(self, value=None, exception=None):
+        raise AsyncValueError("AsyncList cannot be cleared")
+
+    def get(self, timeout=None):
+        """returns a list of values retrieved from AsyncValue elements
+           time timeout is for each element, so maximum timeout is timeout*len(AsyncList)"""
+        return [value.get(timeout) for value in self._value]
+
+    def wait(self, timeout=None):
+        """wait for all items to be set. timeout is per item"""
+        for value in self._value:
+            value.wait(timeout)
+
+    def isSet(self):
+        return next((False for v in self._value if not v.is_set()), True)
+
+    is_set = isSet
+
+    def is_error(self):
+        """return True if one of it's children has error"""
+        return next((True for v in self._value if v.is_error()), False)
+
+
+class AsyncAggregator(AsyncList):
+    """deprecated, Use AsyncList instead"""
     def __init__(self, *iterable):
+        super(AsyncAggregator, self).__init__()
         self._values = [i for i in iterable]
 
     def append(self, value):
@@ -82,4 +115,3 @@ class AsyncAggregator(AsyncBase):
             if hasattr(value, 'is_error') and value.is_error():
                 return True
         return False
-
