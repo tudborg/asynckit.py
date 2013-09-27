@@ -105,6 +105,9 @@ class AsyncList(AsyncValue):
         """return True if one of it's children has error"""
         return next((True for v in self._value if v.is_error()), False)
 
+    def pool_chain(self):
+        raise AsyncValueError("you cannot yet chain on an AsyncList. Sorry")
+
 
 class AsyncAggregator(AsyncList):
     """deprecated, Use AsyncList instead"""
