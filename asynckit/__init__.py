@@ -4,6 +4,6 @@ from value  import AsyncValue
 
 __author__     = "Henrik Tudborg"
 __license__    = "MIT"
-__version__    = "0.3.3"
+__version__    = "0.4.0"
 __maintainer__ = "Henrik Tudborg"
 __email__      = "henrik@tudb.org"
