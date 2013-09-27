@@ -3,46 +3,60 @@
 asynckit.py
 ===========
 
-AsyncKit is a micro-toolkit for doing async work in python 
+AsyncKit is a micro-toolkit for doing thread-pooled async work in python 
 (in your otherwise hacked togethe synchronous single-file script)
+
+It is nothing fancy, but is really great for running a lot of 
+IO-heavy work in parallel and return the results (Like scraping).
 
 Usage
 ----------
 
 ### The Pool
 
+Most of the time you will only need to import the Pool class
+
 Import the Pool:
 ```python
 from asynckit import Pool
 ```
 
-Create a pool object with your desired number of workers
+Create a pool object with your desired number of workers:
 ```python
 my_pool = Pool(worker_count=4)
 ```
 
 ### Add some work
 
-You hand a pool a callable.
-The easiest way is by defining a function.
-You will be able to retrieve the return value later,
-and any exception raised inside your work be be caught
-and stored until you are ready for the result of your work to be retrieved,
-where it will be re-raised.
+Work in asynckit is any callable. Simple as that:
 
-Let's add some work
 ```python
+# our work is to download some url and return the result
 def download_url(url):
     return urllib2.urlopen(url).read()
 
-asyncResultObject = my_pool.do(download_url, 'http://www.python.org/')
+# we schedule the work by calling the Pools .do() method
+our_async_value = my_pool.do(download_url, 'http://www.python.org/')
+
+# to retrieve the result, call .get() on the async value
+# Note that we hand .get() the True argument. True means "wait for result forever"
+# you can also give it a float or an integer to wait that number of seconds for the result
+
+python_org_site = our_async_value.get(True)
+print len(python_org_site)
+
+# If we use a timeout, and the timeout expires, get() will return None
+# Also note that if our work (the download_url() function) throws an exception,
+# the exception is raised when calling .get()
+# So always remember to call .get() if you need the exception raised.
+# (you can check for exceptions by calling the .is_error() method in the AsyncValue)
 ```
-Here we tell `my_pool` to call `download_url` with the argument `'http://www.python.org/'`.
+
+In the above example we tell the pool `my_pool` to call `download_url` with the argument `'http://www.python.org/'`.
 You can add as many arguments as you like, and even keyword arguments like you would expect from any regular function call.
 
 The return value of the `.do()` method is an object of type `AsyncValue`.
-The `AsyncValue` is a `threading.Event` with the added bonus of being able to
-carry a value.
+The `AsyncValue` is a `threading.Event`-ish object with the added bonus of containing a value (and exceptions if any).
 
 When your work completes, the return value will be stored in the `AsyncValue` object
 ready for retrieval.
@@ -50,7 +64,7 @@ ready for retrieval.
 Before you retrieve your value, ensure that the work is completed by checking if the
 `AsyncValue` object is set with the `.is_set()` method.
 
-You can also wait for the result by calling the objects `.wait()` method.
+You can wait for the result by calling the objects `.wait()` method ( NOTE: `.wait()` blocks the current thread! )
 
 See [http://docs.python.org/2/library/threading.html#event-objects]() for how to work
 with the `AsyncValue` object as a `threading.Event`.
@@ -61,6 +75,7 @@ Alternatively you can call `.get()` with a timeout in seconds to block and wait 
 This is identical to calling `.wait()` just before calling `.get()`.
 
 `.get()` returns the return value of your work, or raise an exception thrown inside your work.
+If you passed a timeout in seconds to `.get()` it will return `None` if the timeout expired.
 
 
 ### Joining multiple AsyncValues
