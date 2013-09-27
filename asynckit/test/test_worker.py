@@ -1,6 +1,6 @@
 import unittest
 
-from ..value  import AsyncValue
+from ..value  import AsyncValue, AsyncList
 from ..worker import Worker
 from ..errors import WorkerError, InvalidWorkTypeError
 import time
@@ -84,6 +84,30 @@ class TestWorkerCase(unittest.TestCase):
         res.wait(timeout=0.2)                     # wait for work to complete (max 200ms)
         self.assertTrue(res.is_set())             # assert that value is set after wait returns
         self.assertEqual(res.get(), 3)            # assert that work actually added 1 and 2
+
+
+    def test_worker_does_work_with_async_list(self):
+        q = Queue.Queue()                         # queue
+        worker = Worker(q)                        # create worker
+        worker.start()                            # start worker
+        res = AsyncValue()
+        def work(a):
+            return sum(a)
+
+        values = [AsyncValue(), AsyncValue(), AsyncValue()]
+        a = AsyncList(values)
+        values[0].set(1)
+        values[1].set(2)
+
+        #put a work tuple in queue
+        q.put( (res, work, [a], {}) )
+        res.wait(timeout=0.2)                     # wait for work to complete (max 200ms)
+        self.assertFalse(res.is_set())            # assert work is not yet completed
+        values[2].set(3)                          # now set last value
+        res.wait(timeout=0.2)                     # wait for work to complete (max 200ms)
+        self.assertTrue(res.is_set())             # assert that result is now ready
+        self.assertEqual(res.get(), 6)            # assert that result is sum of list
+
 
     def test_worker_handles_reschedule(self):
         q = Queue.Queue()                         # queue
