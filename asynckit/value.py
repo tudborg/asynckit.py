@@ -10,6 +10,8 @@ class AsyncValue(threading._Event):
         super(AsyncValue, self).__init__()
         self._value     = None
         self._exception = None
+        self._chains    = []    # [ (pool, result, callback, args, kwargs) ]
+        self._pool      = None  # The pool this value is scheduled on if any
 
     def clear(self):
         """ clear event and value """
@@ -27,6 +29,11 @@ class AsyncValue(threading._Event):
         self._exception = exception
         super(AsyncValue, self).set()
 
+        # handled chained logic
+        while len(self._chains) > 0:
+            pool, result, callback, args, kwargs = self._chains.pop(0) #pop in order of added
+            (pool or self._pool)._do(result, callback, *args, **kwargs)
+
     def get(self, timeout=None):
         """get the value, block until value is ready or until timeout if timeout is set
            if timeout is 0, block forever"""
@@ -43,6 +50,23 @@ class AsyncValue(threading._Event):
 
     def is_error(self):
         return self._exception is not None
+
+
+    # chain logic
+    def pool_chain(self, pool, callback, *args, **kwargs):
+        """return a new AsyncValue that will be set with the result value of callback"""
+        result = AsyncValue()
+        if self.is_set():
+            pool._do(result, callback, *args, **kwargs)
+        else:
+            self._chains.append( (pool, result, callback, args, kwargs) )
+        return result
+    #chain shortcut for adding to pool used by self
+    def chain(self, callback, *args, **kwargs):
+        """chain a callback to be scheduled on self._pool when this value is ready"""
+        return self.pool_chain(self._pool, callback, *args, **kwargs)
+
+
 
 class AsyncList(AsyncValue):
     """ AsyncList contains 0 or more AsyncValues
@@ -70,10 +94,10 @@ class AsyncList(AsyncValue):
         for value in self._value:
             value.wait(timeout)
 
-    def isSet(self):
+    def is_set(self):
         return next((False for v in self._value if not v.is_set()), True)
 
-    is_set = isSet
+    isSet = is_set
 
     def is_error(self):
         """return True if one of it's children has error"""

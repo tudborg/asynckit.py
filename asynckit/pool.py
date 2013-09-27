@@ -50,11 +50,16 @@ class Pool(object):
 
     def do(self, work, *args, **kwargs):
         """ do work with *args and **kwargs where work is instance of callable
-            do() returns an AsyncValue object.
+            do() returns a new AsyncValue object.
             the AsyncValue object is a threading.Event that sets a value when the event is set.
             see threading.Event documentation for possible methods.
             AsyncValue has the additional get() method that retrieves the value (or None if not set) """
         result = AsyncValue()
+        return self._do(result, work, *args, **kwargs)
+
+    def _do(self, result, work, *args, **kwargs):
+        """_do() expects first argument to be a settable AsyncValue. It returns the AsyncValue"""
+        result._pool = self
         self.scheduled_work.put( (result, work, args, kwargs) )
         return result
 
