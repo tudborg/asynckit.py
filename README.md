@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/tbug/asynckit.py.png?branch=master)](travis)
-[![Coverage Status](https://coveralls.io/repos/tbug/asynckit.py/badge.png?branch=master)](coveralls)
+[![Build Status](https://travis-ci.org/tbug/asynckit.py.png?branch=master)][travis]
+[![Coverage Status](https://coveralls.io/repos/tbug/asynckit.py/badge.png?branch=master)][coveralls]
 asynckit.py
 ===========
 
