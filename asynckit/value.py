@@ -29,10 +29,7 @@ class AsyncValue(threading._Event):
         self._exception = exception
         super(AsyncValue, self).set()
 
-        # handled chained logic
-        while len(self._chains) > 0:
-            pool, result, callback, args, kwargs = self._chains.pop(0) #pop in order of added
-            (pool or self._pool)._do(result, callback, *args, **kwargs)
+        self._trigger_chains()
 
     def get(self, timeout=None):
         """get the value, block until value is ready or until timeout if timeout is set
@@ -66,6 +63,11 @@ class AsyncValue(threading._Event):
         """chain a callback to be scheduled on self._pool when this value is ready"""
         return self.pool_chain(self._pool, callback, *args, **kwargs)
 
+    def _trigger_chains(self):
+        # handled chained logic
+        while len(self._chains) > 0:
+            pool, result, callback, args, kwargs = self._chains.pop(0) #pop in order of added
+            (pool or self._pool)._do(result, callback, *args, **kwargs)
 
 
 class AsyncList(AsyncValue):
