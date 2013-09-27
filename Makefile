@@ -1,6 +1,7 @@
 ################################################
 # Makefile for AsyncKit.py with release helper #
 ################################################
+SHELL := /bin/bash
 usage: ;
 	# Usage:
 	#   make test      - run test suite
@@ -19,7 +20,7 @@ install: ;
 
 .set_pypirc: .version_notice ;
 	#creates the ~/.pypirc file for release
-	@echo "\
+	@echo -e "\
 [distutils] \n\
 index-servers =\n\
     pypi\n\
