@@ -1,3 +1,12 @@
+# Note
+
+This project is pretty old and unmaintained.
+The chain functionality is buggy, and i don't intend to fix it, as i have moved to python3.
+
+The repo will be kept for reference.
+
+- - - - - 
+
 [![Build Status](https://travis-ci.org/tbug/asynckit.py.png?branch=master)][travis]
 [![Coverage Status](https://coveralls.io/repos/tbug/asynckit.py/badge.png?branch=master)][coveralls]
 asynckit.py
